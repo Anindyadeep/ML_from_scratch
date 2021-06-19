@@ -69,9 +69,9 @@ class MultipleLinearRegression:
         print(loss_before, loss_after, "\n")
         self.count += 1
         if self.count % 2 == 0: print(f"after {self.count} loss: {self._MSE()}")
-        self.train_recursive()
-
-        if self.count == 10: return
+        
+        if loss_before - loss_after > 0.01 : self.train_recursive()
+        else: return
 
 if __name__ == '__main__':
     from sklearn import datasets
@@ -90,6 +90,7 @@ if __name__ == '__main__':
 
     mlr = MultipleLinearRegression(X_train, y_train)
     mlr.train(500, 0.03)
+    mlr.train_recursive(0.003)
 
     model = LinearRegression().fit(X_train, y_train)
     pred_model = model.predict(X_test)
