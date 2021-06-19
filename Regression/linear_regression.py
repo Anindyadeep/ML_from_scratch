@@ -66,7 +66,7 @@ class LinearRegression:
             self.b -= learning_rate * b_grad
 
             if epoch % 50 == 0: print(f"After epoch {epoch} loss : {self._MSE()}, weights: {self.W}, bias: {self.b}")
-            self.history['loss'].append(self._MSE())
+            self.history['loss'].append(int(self._MSE()))
         if int(self._MSE()) < int(self._optimal_loss_point()): print("reached less than optimal loss")
     
 
