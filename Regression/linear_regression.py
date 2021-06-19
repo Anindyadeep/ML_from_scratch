@@ -4,16 +4,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 '''
-TODO: add batch learning
-TODO: add the global minima target reach point
+TODO: add batch learning (if possible)
 '''
 '''
-Things to change
---> add the universal predict function
---> add the universal loss function
 --> solve the dimension problem
 '''
-
+ 
 class LinearRegression:
     def __init__(self, X, y):
         if X.shape != (1,len(X)): 
@@ -31,10 +27,16 @@ class LinearRegression:
         predictions = np.dot(self.W, X) + self.b
         return predictions
     
-    def MSE(self):
+    def _MSE(self):
         m = len(self.X)
         mse = 1/(2*m) * (np.sum((self.y-self.predict(self.X)), axis=1, keepdims=True)**2)
         return mse
+    
+    def loss(self, predictions, ground_truth):
+        m = len(predictions)
+        loss = 1/(2*m) * (np.sum((ground_truth - predictions), axis=1, keepdims=True)**2)
+        return loss
+
     
     def _gradient_descent(self):
         m = len(self.X)
@@ -58,20 +60,18 @@ class LinearRegression:
 
     def train(self, epochs = 100, learning_rate = 0.001):
         for epoch in range(epochs):
-            self.MSE()
+            self._MSE()
             w_grad, b_grad = self._gradient_descent()
             self.W -= learning_rate * w_grad
             self.b -= learning_rate * b_grad
 
-            if epoch % 50 == 0: print(f"After epoch {epoch} loss : {self.MSE()}, weights: {self.W}")
-            self.history['loss'].append(self.MSE())
-        if int(self.MSE()) < int(self._optimal_loss_point()): print("reached less than optimal loss")
+            if epoch % 50 == 0: print(f"After epoch {epoch} loss : {self._MSE()}, weights: {self.W}, bias: {self.b}")
+            self.history['loss'].append(self._MSE())
+        if int(self._MSE()) < int(self._optimal_loss_point()): print("reached less than optimal loss")
     
 
 if __name__ == '__main__':
     X = np.random.randn(100,1)
     y = np.random.randint(2, size=(100,1))
     slr = LinearRegression(X, y)
-    #print(int(slr.MSE()))
-    #print(slr._optimal_loss_point())
     slr.train()
