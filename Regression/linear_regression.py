@@ -7,6 +7,13 @@ import matplotlib.pyplot as plt
 TODO: add batch learning
 TODO: add the global minima target reach point
 '''
+'''
+Things to change
+--> add the universal predict function
+--> add the universal loss function
+--> solve the dimension problem
+'''
+
 class LinearRegression:
     def __init__(self, X, y):
         if X.shape != (1,len(X)): 
