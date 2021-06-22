@@ -45,16 +45,37 @@ class LinearRegression:
         self.count = 0
 
     def predict(self, X):
+        '''
+        Input: X (feature), where the class can automatically 
+        can control the dimensionality, and it will return the predictions
+        after performing the regression from the trained weights and bias
+        '''
         X, _ = universal_reshape(X, X)
         predictions = np.dot(self.W, X) + self.b
         return predictions
     
     def _MSE(self):
+        '''
+        This function will calculate the Mean Squared Error loss
+        of the model, where \n
+        y_hat (i.e. predicted) = W . X + b, \n
+        y -->  (ground truth value) \n
+
+        loss (L) = (y-y_hat) ^ 2
+        cost (J) = ∑L (from i = 1, m) where m = total no: of examples.
+        '''
         J = (self.y - (np.dot(self.W, self.X)+self.b)) ** 2
         mse = 1/(2*self.m) * (np.sum(J,axis=1, keepdims=True))
         return mse 
     
     def loss(self, predictions, ground_truth):
+        '''
+        Input: (predictions), (ground_truth) \n
+        Output: Total Loss \n 
+
+        Where, Loss (L) = (predictions - ground_truth) ^ 2 \n
+        and Cost (J) = ∑L (from i = 1, m) where m = total no: of examples.
+        '''
         predictions, _ = universal_reshape(predictions, predictions)
         ground_truth, _ = universal_reshape(ground_truth, ground_truth)
 
@@ -67,13 +88,39 @@ class LinearRegression:
         return loss
     
     def _compute_grads(self):
+        '''
+        This function will compute the gradients of the weights and the bias w.r.t. the loss \n
+        where: \n
+        
+        dJ/dW = -2/m * (Y-(W.X + b) . transpose(X)) 
+        dJ/db = -2/m * ∑ (Y-*W.X + b)
+
+        W := W - (learning rate) * dJ/dW
+        b := b - (learning rate) * dJ/db
+        '''
         w_grads = -2/self.m * np.dot((self.y - (np.dot(self.W, self.X)+self.b)), self.X.T) 
         b_grads = -2/self.m * np.sum((self.y - (np.dot(self.W, self.X)+self.b)), axis=1, keepdims=True)
         return (w_grads, b_grads)
 
     def train(self, epochs=100, learning_rate=0.001, show_history=False):
+        '''
+        Required parameters : None \n
+        Tweakable parameters: \n
+        (epochs) : for how many iterations the train will happen \n
+        (learning_rate) : a custom learning rate can be sometime useful \n
+        (show_history) : will return the history of losses and any other metrics \n
+
+        NOTE: \n
+        It can retrive the model history by calling : model.history['loss'] or any other metric
+        as it is in the form of the dictionary.
+
+        '''
         for epoch in range(1, epochs+1):
-            '''TODO: IMP DO THE LOSS AND ALL w.r.t THE VALIDATION LOSS'''
+            '''
+            TODO: 
+                    1. IMP DO THE LOSS AND ALL w.r.t THE VALIDATION LOSS
+                    2. More optimized learning rate using grid search and other techniques
+            '''
             
             w_grad, b_grad = self._compute_grads()
             self.W -= learning_rate * w_grad 
