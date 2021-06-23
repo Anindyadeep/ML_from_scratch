@@ -1,6 +1,6 @@
 import math 
 import numpy as np
-from ml_utils import *
+from ml_regression_utils import *
 
 
                             #######################################
@@ -185,3 +185,111 @@ class PolynomialRegression(LinearRegression):
 
         predictions = np.dot(self.W, X) + self.b
         return predictions    
+
+
+
+
+                            #######################################
+                            #            Ridge regression         #
+                            #######################################
+
+
+
+class RidgeRegression(LinearRegression):
+    def __init__(self, X, y, regularization_factor, weight_initializer='uniform'):
+        super(RidgeRegression, self).__init__(X, y, weight_initializer)
+        self.regularization_factor = regularization_factor
+
+        # neeed to add the r2 score
+        self.history = {'loss': []}
+        self.count = 0
+        self.m = int(self.X.shape[1])
+
+    def ridge_loss(self):
+        return self._MSE() + 1/(2*self.m) * L2_regularization(self.W, self.regularization_factor)
+
+
+    def train(self, epochs=100, learning_rate=0.001, show_history=False):
+
+        for epoch in range(1, epochs+1):
+            w_grad, b_grad = self._compute_grads()
+            w_grad +=  (self.regularization_factor * self.W)  
+
+            self.W -= learning_rate * w_grad 
+            self.b -= learning_rate * b_grad
+
+            if epoch % 50 == 0 and show_history:
+                if epoch % 50 == 0: print(f"After epoch {epoch} loss : {self.ridge_loss()}")
+            self.history['loss'].append(int(self.ridge_loss()))
+
+
+
+
+
+
+                            #######################################
+                            #            Lasso regression         #
+                            #######################################
+
+
+class LassoRegression(LinearRegression):
+    def __init__(self, X, y, regularization_factor, weight_initializer='uniform'):
+        super(RidgeRegression, self).__init__(X, y, weight_initializer)
+        self.regularization_factor = regularization_factor
+
+        # neeed to add the r2 score
+        self.history = {'loss': []}
+        self.count = 0
+        self.m = int(self.X.shape[1])
+
+    def lasso_loss(self):
+        return self._MSE() + 1/(self.m) * L1_regularization(self.W, self.regularization_factor)
+
+
+    def train(self, epochs=100, learning_rate=0.001, show_history=False):
+
+        for epoch in range(1, epochs+1):
+            w_grad, b_grad = self._compute_grads()
+            w_grad += (self.regularization_factor * np.sign(self.W))  
+
+            self.W -= learning_rate * w_grad 
+            self.b -= learning_rate * b_grad
+
+            if epoch % 50 == 0 and show_history:
+                if epoch % 50 == 0: print(f"After epoch {epoch} loss : {self.lasso_loss()}")
+            self.history['loss'].append(int(self.lasso_loss()))
+
+
+if __name__ == '__main__':
+    from sklearn import datasets
+    from sklearn.model_selection import train_test_split
+    #from sklearn.linear_model import LinearRegression
+
+    n_features = 10
+    X, y = datasets.make_regression(n_samples=600, n_features=n_features, noise=20, random_state=4)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1234)
+
+    '''
+    regressor = LinearRegression(X_train, y_train)
+    regressor.train(epochs=200, learning_rate=0.03, show_history=True)
+
+    predictions = regressor.predict(X_test)
+    print(regressor.loss(predictions, y_test))
+    '''
+    
+    ridge = RidgeRegression(X_train, y_train, 0.0003)
+    ridge.train(epochs=150, learning_rate=0.01, show_history=True)
+    preds = ridge.predict(X_test)
+    print("RIDGE")
+    print("\n", ridge.loss(preds, y_test), "\n")
+
+    lasso = RidgeRegression(X_train, y_train, 0.0003)
+    lasso.train(epochs=150, learning_rate=0.01, show_history=True)
+    preds = lasso.predict(X_test)
+    print("LASSO")
+    print("\n", lasso.loss(preds, y_test), "\n")
+
+    regressor = LinearRegression(X_train, y_train)
+    regressor.train(epochs=150, learning_rate=0.01, show_history=True)
+    print("SIMPLE")
+    print(regressor.loss(regressor.predict(X_test), y_test), "\n")

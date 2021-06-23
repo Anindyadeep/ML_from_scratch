@@ -3,6 +3,10 @@ import itertools as itr
 import numpy as np
 
 def universal_reshape(X, y):
+        '''
+        This function is for reshaping any types of X, y to the correct shapes
+        for the custom mathematical computation done here
+        '''
         if len(X.shape) == 1:
             X = X.reshape(1, len(X))
 
@@ -43,6 +47,29 @@ def polynomial_features(X, degree):
 
 
 
+def L1_regularization(weights, regularization_factor):
+    '''
+    This L1 regularization will create the L1 norm 
+    such that we will calculate during the calculation 
+    for the Lasso regression
+    (more documentation required)
+    '''
+
+    return regularization_factor * np.linalg.norm(weights)
+
+
+def L2_regularization(weights, regularization_factor):
+    '''
+    This L2 regularization will create the L2 norm 
+    such that we will calculate during the calculation 
+    for the Ridge regression
+    (more documentation required)
+    '''
+    return regularization_factor * np.dot(weights, weights.T)
+
+
+  
+
 if __name__ == '__main__':
     '''
     testing the 'universal_reshape' function
@@ -67,14 +94,3 @@ if __name__ == '__main__':
 
     X3_ans, y3_ans = universal_reshape(X3, y3)
     print(X3_ans.shape, y3_ans.shape, "\n")
-
-    # test case 4
-    '''
-    under developement
-    X4 = np.random.randn(200)
-    y4 = np.random.randn(100)
-
-    X4_ans, _ = universal_reshape(X4)
-    print(X4_ans.shape)
-    print(_)
-    '''
