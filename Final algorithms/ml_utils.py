@@ -17,6 +17,32 @@ def universal_reshape(X, y):
 
         return X, y
 
+
+
+def polynomial_features(X, degree):
+    '''
+    This function below is been temporarily taken from
+    the github: https://github.com/eriklindernoren/ML-From-Scratch/blob/a2806c6732eee8d27762edd6d864e0c179d8e9e8/mlfromscratch/utils/data_manipulation.py#L61
+    As I will understand the concept, I will replace with my own logic
+    '''
+    n_samples, n_features = np.shape(X)
+
+    def index_combinations():
+        combs = [itr.combinations_with_replacement(range(n_features), i) for i in range(0, degree + 1)]
+        flat_combs = [item for sublist in combs for item in sublist]
+        return flat_combs
+    
+    combinations = index_combinations()
+    n_output_features = len(combinations)
+    X_new = np.empty((n_samples, n_output_features))
+    
+    for i, index_combs in enumerate(combinations):  
+        X_new[:, i] = np.prod(X[:, index_combs], axis=1)
+
+    return X_new
+
+
+
 if __name__ == '__main__':
     '''
     testing the 'universal_reshape' function
