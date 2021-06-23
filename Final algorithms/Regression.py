@@ -2,6 +2,13 @@ import math
 import numpy as np
 from ml_utils import *
 
+
+                            #######################################
+                            #          Linear regression          #
+                            #######################################
+
+
+
 class LinearRegression:
     def __init__(self, X, y, weight_initializer = 'uniform', ):
         '''
@@ -41,6 +48,7 @@ class LinearRegression:
             print('error')
 
         self.b = np.zeros(shape=(1,1))
+        # neeed to add the r2 score
         self.history = {'loss': []}
         self.count = 0
 
@@ -131,36 +139,49 @@ class LinearRegression:
             self.history['loss'].append(int(self._MSE()))
     
 
+
+
+
+
+
+                            #######################################
+                            #         Polynomial regression       #
+                            #######################################
+
+
+
 class PolynomialRegression(LinearRegression):
-    def __init__(self, X, y, degree):
+    def __init__(self, X, y, degree, weight_initializer = 'uniform'):
         super(PolynomialRegression, self).__init__(X, y)
-
-        self.degree = degree 
         X_temp, self.y = universal_reshape(X, y)
-        self.X = polynomial_features(X_temp,self.degree).T
+        self.degree = degree
+        self.X = polynomial_features(X_temp.T, self.degree).T
 
-        n_features = int(self.X_new.shape[0])
+        n_features = int(self.X.shape[0])
         limit = 1/math.sqrt(n_features)
 
-        self.W = np.random.uniform(-limit, limit, (1, n_features))
-        print(self.W.shape)
-        print(self.b.shape)
+        if weight_initializer == 'uniform':
+            self.W = np.random.uniform(-limit, limit, (1, n_features))
+        elif weight_initializer == 'random':
+            self.W = np.random.randn(1, n_features)
+        else:
+            print('error')
 
+        self.b = np.zeros(shape=(1,1))
+        # neeed to add the r2 score
+        self.history = {'loss': []}
+        self.count = 0
+        self.m = int(self.X.shape[1])     
 
-if __name__ == '__main__':
-    from sklearn import datasets
-    from sklearn.model_selection import train_test_split
-    #from sklearn.linear_model import LinearRegression
+    def predict(self, X):
+        '''
+        Input: X (feature), where the class can automatically 
+        can control the dimensionality, and it will return the predictions
+        after performing the regression from the trained weights and bias
+        '''
+        X, _ = universal_reshape(X, X)
+        if X.shape[0] != self.X.shape[0]:
+            X = polynomial_features(X.T, self.degree).T 
 
-    n_features = 10
-    X, y = datasets.make_regression(n_samples=600, n_features=n_features, noise=20, random_state=4)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1234)
-
-    
-    regressor = LinearRegression(X_train, y_train)
-    regressor.train(epochs=200, learning_rate=0.03, show_history=True)
-
-    predictions = regressor.predict(X_test)
-    print(regressor.loss(predictions, y_test))
-    
-    plr = PolynomialRegression(X_train, y_train, 3)
+        predictions = np.dot(self.W, X) + self.b
+        return predictions    
