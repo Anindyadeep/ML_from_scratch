@@ -131,6 +131,21 @@ class LinearRegression:
             self.history['loss'].append(int(self._MSE()))
     
 
+class PolynomialRegression(LinearRegression):
+    def __init__(self, X, y, degree):
+        super(PolynomialRegression, self).__init__(X, y)
+
+        self.degree = degree 
+        X_temp, self.y = universal_reshape(X, y)
+        self.X = polynomial_features(X_temp,self.degree).T
+
+        n_features = int(self.X_new.shape[0])
+        limit = 1/math.sqrt(n_features)
+
+        self.W = np.random.uniform(-limit, limit, (1, n_features))
+        print(self.W.shape)
+        print(self.b.shape)
+
 
 if __name__ == '__main__':
     from sklearn import datasets
@@ -141,8 +156,11 @@ if __name__ == '__main__':
     X, y = datasets.make_regression(n_samples=600, n_features=n_features, noise=20, random_state=4)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1234)
 
+    
     regressor = LinearRegression(X_train, y_train)
     regressor.train(epochs=200, learning_rate=0.03, show_history=True)
 
     predictions = regressor.predict(X_test)
     print(regressor.loss(predictions, y_test))
+    
+    plr = PolynomialRegression(X_train, y_train, 3)
