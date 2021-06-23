@@ -49,7 +49,7 @@ class LinearRegression:
 
         self.b = np.zeros(shape=(1,1))
         # neeed to add the r2 score
-        self.history = {'loss': []}
+        self.history = {'loss': [], 'weights': [], 'bias': []}
         self.count = 0
 
     def predict(self, X):
@@ -136,7 +136,11 @@ class LinearRegression:
 
             if epoch % 50 == 0 and show_history:
                 if epoch % 50 == 0: print(f"After epoch {epoch} loss : {self._MSE()}")
-            self.history['loss'].append(int(self._MSE()))
+            self.history['loss'].append(float(self._MSE()))
+
+            if self.W.shape[1] == 1:
+                self.history['weights'].append(float(self.W))
+                self.history['bias'].append(float(self.b))
     
 
 
