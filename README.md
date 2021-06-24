@@ -1,9 +1,6 @@
 # ML_from_scratch
 Learning and rediscovering ML from total scratch
 
-## how to install it
-```pip install deep-gradient```
-
 ## what are the things available now:
 ```
 Regression:
