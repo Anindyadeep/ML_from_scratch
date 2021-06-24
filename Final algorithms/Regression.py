@@ -1,6 +1,6 @@
 import math 
 import numpy as np
-from ml_regression_utils import *
+from ml_regression_utils import * 
 
 
                             #######################################
@@ -49,7 +49,7 @@ class LinearRegression:
 
         self.b = np.zeros(shape=(1,1))
         # neeed to add the r2 score
-        self.history = {'loss': [], 'weights': [], 'bias': []}
+        self.history = {'loss': []}
         self.count = 0
 
     def predict(self, X):
@@ -136,11 +136,7 @@ class LinearRegression:
 
             if epoch % 50 == 0 and show_history:
                 if epoch % 50 == 0: print(f"After epoch {epoch} loss : {self._MSE()}")
-            self.history['loss'].append(float(self._MSE()))
-
-            if self.W.shape[1] == 1:
-                self.history['weights'].append(float(self.W))
-                self.history['bias'].append(float(self.b))
+            self.history['loss'].append(int(self._MSE()))
     
 
 
@@ -156,10 +152,10 @@ class LinearRegression:
 
 class PolynomialRegression(LinearRegression):
     def __init__(self, X, y, degree, weight_initializer = 'uniform'):
-        super(PolynomialRegression, self).__init__(X, y, weight_initializer)
+        super(PolynomialRegression, self).__init__(X, y)
         X_temp, self.y = universal_reshape(X, y)
         self.degree = degree
-        self.X = polynomial_features(X_temp.T, self.degree).T  
+        self.X = polynomial_features(X_temp.T, self.degree).T
 
         n_features = int(self.X.shape[0])
         limit = 1/math.sqrt(n_features)
@@ -169,7 +165,13 @@ class PolynomialRegression(LinearRegression):
         elif weight_initializer == 'random':
             self.W = np.random.randn(1, n_features)
         else:
-            print('error')   
+            print('error')
+
+        self.b = np.zeros(shape=(1,1))
+        # neeed to add the r2 score
+        self.history = {'loss': []}
+        self.count = 0
+        self.m = int(self.X.shape[1])     
 
     def predict(self, X):
         '''
@@ -183,147 +185,3 @@ class PolynomialRegression(LinearRegression):
 
         predictions = np.dot(self.W, X) + self.b
         return predictions    
-
-
-
-
-                            #######################################
-                            #            Ridge regression         #
-                            #######################################
-
-
-class RidgeRegression(LinearRegression):
-    def __init__(self, X, y, regularization_factor, weight_initializer='uniform'):
-        super(RidgeRegression, self).__init__(X, y, weight_initializer)
-        self.regularization_factor = regularization_factor
-
-    def _ridge_loss(self):
-        return self._MSE() + 1/(2*self.m) * L2_regularization(self.W, self.regularization_factor)
-
-
-    def train(self, epochs=100, learning_rate=0.001, show_history=False):
-
-        for epoch in range(1, epochs+1):
-            w_grad, b_grad = self._compute_grads()
-            w_grad +=  (self.regularization_factor * self.W)  
-
-            self.W -= learning_rate * w_grad 
-            self.b -= learning_rate * b_grad
-
-            if epoch % 50 == 0 and show_history:
-                if epoch % 50 == 0: print(f"After epoch {epoch} loss : {self._ridge_loss()}")
-            self.history['loss'].append(int(self._ridge_loss()))
-
-
-
-
-
-
-                            #######################################
-                            #            Lasso regression         #
-                            #######################################
-
-
-class LassoRegression(LinearRegression):
-    def __init__(self, X, y, regularization_factor, weight_initializer='uniform'):
-        super(LassoRegression, self).__init__(X, y, weight_initializer)
-        self.regularization_factor = regularization_factor
-
-    def _lasso_loss(self):
-        return self._MSE() + 1/(self.m) * L1_regularization(self.W, self.regularization_factor)
-
-    def train(self, epochs=100, learning_rate=0.001, show_history=False):
-
-        for epoch in range(1, epochs+1):
-            w_grad, b_grad = self._compute_grads()
-            w_grad += (self.regularization_factor * np.sign(self.W))  
-
-            self.W -= learning_rate * w_grad 
-            self.b -= learning_rate * b_grad
-
-            if epoch % 50 == 0 and show_history:
-                if epoch % 50 == 0: print(f"After epoch {epoch} loss : {self._lasso_loss()}")
-            self.history['loss'].append(int(self._lasso_loss()))
-
-
-
-
-                            #######################################
-                            #         ElasticNet regression       #
-                            #######################################
-
-
-
-class ElasticNetRegression(LinearRegression):
-    def __init__(self, X, y, alpha, beta, weight_initializef='uniform'):
-        super(ElasticNetRegression, self).__init__(X, y)
-        self.alpha = alpha 
-        self.beta = beta 
-        
-    def _elastic_loss(self):
-        return self._MSE() + 1/(self.m) * L1_regularization(self.W, self.alpha) + 1/(2*self.m) * L2_regularization(self.W, self.beta)
-    
-    def train(self, epochs=100, learning_rate=0.001, show_history=False):
-        for epoch in range(1, epochs+1):
-            w_grad, b_grad = self._compute_grads()
-            w_grad += (self.alpha * np.sign(self.W)) + (self.beta * self.W)
-
-            self.W -= learning_rate * w_grad 
-            self.b -= learning_rate * b_grad
-
-            if epoch % 50 == 0 and show_history:
-                if epoch % 50 == 0: print(f"After epoch {epoch} loss : {self._elastic_loss()}")
-            self.history['loss'].append(int(self._elastic_loss()))
-        
-
-                            #######################################
-                            #      Polynomial Ridge regression    #
-                            #######################################
-
-
-
-class PolynomialRidgeRegression(LinearRegression):
-    def __init__(self, X, y, degree, regularization_factor, weight_initializer='uniform'):
-        super(PolynomialRidgeRegression, self).__init__(X, y, weight_initializer)
-
-        self.regularization_factor = regularization_factor
-        X_temp, self.y = universal_reshape(X, y)
-        self.degree = degree
-        self.X = polynomial_features(X_temp.T, self.degree).T  
-
-        n_features = int(self.X.shape[0])
-        limit = 1/math.sqrt(n_features)
-
-        if weight_initializer == 'uniform':
-            self.W = np.random.uniform(-limit, limit, (1, n_features))
-        elif weight_initializer == 'random':
-            self.W = np.random.randn(1, n_features)
-        else:
-            print('error')   
-
-        
-    def predict(self, X):
-        X, _ = universal_reshape(X, X)
-        if X.shape[0] != self.X.shape[0]:
-            X = polynomial_features(X.T, self.degree).T 
-
-        predictions = np.dot(self.W, X) + self.b
-        return predictions  
-
-    def _ridge_loss(self):
-        return self._MSE() + 1/(2*self.m) * L2_regularization(self.W, self.regularization_factor)
-
-
-    def train(self, epochs=100, learning_rate=0.001, show_history=False):
-
-        for epoch in range(1, epochs+1):
-            w_grad, b_grad = self._compute_grads()
-            w_grad +=  (self.regularization_factor * self.W)  
-
-            self.W -= learning_rate * w_grad 
-            self.b -= learning_rate * b_grad
-
-            if epoch % 50 == 0 and show_history:
-                if epoch % 50 == 0: print(f"After epoch {epoch} loss : {self._ridge_loss()}")
-            self.history['loss'].append(int(self._ridge_loss()))
-
