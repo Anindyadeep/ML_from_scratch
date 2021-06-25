@@ -327,3 +327,10 @@ class PolynomialRidgeRegression(LinearRegression):
                 if epoch % 50 == 0: print(f"After epoch {epoch} loss : {self._ridge_loss()}")
             self.history['loss'].append(int(self._ridge_loss()))
 
+
+if __name__ == '__main__':
+    X = np.random.randn(300,3)
+    y = np.random.randn(300, 1)
+    regressor = LinearRegression(X, y)
+    regressor.train(show_history=True)
+    
