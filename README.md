@@ -10,10 +10,16 @@ Regression:
         4. Lasso Regression
         5. ElasticNet Regression
         6. Polynomial Ridge Regression
+        7. K-Nearest Neighbors (KNN) [Regression]
+        
 ```
 
-Other Different algorithms such as KNNs, Decision Trees, 
+```
+Classification:
+        1. K-Nearest Neighbors (KNN)
+        
+```
+
+Other Different algorithms such as Decision Trees, 
 Naive Bias, and all other unsupervised along with deep
-learning algorithms will be comming soon, so stay tuned
-
-
+learning algorithms will be comming soon, so stay tuned.

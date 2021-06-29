@@ -45,7 +45,7 @@ class LinearRegression:
             self.W = np.random.randn(1, n_features)
         
         else:
-            print('error')
+            raise Exception("Weight intialization can be either 'uniform' or 'normal' ")
 
         self.b = np.zeros(shape=(1,1))
         # neeed to add the r2 score
@@ -86,11 +86,6 @@ class LinearRegression:
         '''
         predictions, _ = universal_reshape(predictions, predictions)
         ground_truth, _ = universal_reshape(ground_truth, ground_truth)
-
-        if predictions.shape[0] > predictions.shape[1]:
-            predictions = predictions.T
-        if ground_truth.shape[0] > ground_truth.shape[1]:
-            ground_truth = ground_truth.T
 
         loss = 1/(2*self.m) * (np.sum((ground_truth - predictions), axis=1, keepdims=True)**2)
         return loss
@@ -169,7 +164,7 @@ class PolynomialRegression(LinearRegression):
         elif weight_initializer == 'random':
             self.W = np.random.randn(1, n_features)
         else:
-            print('error')   
+            raise Exception("Weight intialization can be either 'uniform' or 'normal' ") 
 
     def predict(self, X):
         '''
@@ -299,7 +294,7 @@ class PolynomialRidgeRegression(LinearRegression):
         elif weight_initializer == 'random':
             self.W = np.random.randn(1, n_features)
         else:
-            print('error')   
+            raise Exception("Weight intialization can be either 'uniform' or 'normal' ")
 
         
     def predict(self, X):
