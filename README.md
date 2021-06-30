@@ -17,6 +17,9 @@ Regression:
 ```
 Classification:
         1. K-Nearest Neighbors (KNN)
+        2. Binary Logistic Regression
+        3. Multi class Logistic Regression (contains bugs)
+        
         
 ```
 

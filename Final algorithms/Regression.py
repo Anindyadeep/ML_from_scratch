@@ -323,9 +323,59 @@ class PolynomialRidgeRegression(LinearRegression):
             self.history['loss'].append(int(self._ridge_loss()))
 
 
-if __name__ == '__main__':
-    X = np.random.randn(300,3)
-    y = np.random.randn(300, 1)
-    regressor = LinearRegression(X, y)
-    regressor.train(show_history=True)
+
+
+                            #######################################
+                            #           KNN regression            #
+                            #######################################
+
+
+
+
+class KNN_Regression:
+    def __init__(self, n_neighbors):
+        self.K = n_neighbors
     
+    def fit(self, X, y):
+        self.X_train = X 
+        self.Y_train = y
+
+    def _ecludian_distances(self, x1, x2):
+        if x1.shape[0] != 1:
+            x1 = x1.reshape(1, len(x1))
+        if x2.shape[0] != 1:
+            x2 = x2.reshape(1, len(x2))
+        
+        dist = np.sum((x1 - x2)**2, axis = 1, keepdims=True)
+        dist = np.sqrt(dist)
+        return dist
+
+    def predict(self, X_test):
+        predictions = []
+        for x_test in X_test:
+            distances = {}
+            x_test = x_test.reshape(1, len(x_test))
+            for (x_train, y_train) in zip(self.X_train, self.Y_train):
+                x_train = x_train.reshape(1, len(x_train))
+                dist = self._ecludian_distances(x_test, x_train)
+                distances[float(dist)] = y_train
+            
+            k = 0
+            k_dist = []
+            for i in sorted(distances):
+                k += 1
+                k_dist.append(distances[i])
+                if k == self.K:
+                    break
+            predictions.append(np.sum(np.array(k_dist))/self.K)
+        
+        predictions = np.array(predictions).reshape(1, len(predictions))
+        return predictions
+
+
+    
+    def loss(self, predictions, ground_truth):
+        _, ground_truth = universal_reshape(ground_truth, ground_truth)
+        m = len(predictions)
+        loss = 1/(2*m) * (np.sum((ground_truth - predictions), axis=1, keepdims=True)**2)
+        return loss
