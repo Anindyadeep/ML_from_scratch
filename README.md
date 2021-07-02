@@ -19,7 +19,12 @@ Classification:
         1. K-Nearest Neighbors (KNN)
         2. Binary Logistic Regression
         3. Multi class Logistic Regression (contains bugs)
-        
+
+        TODO:
+        1. Support Vector Machines
+        2. Naive Bayes
+        3. Decison Trees
+        4. Random Forests
         
 ```
 
