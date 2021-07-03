@@ -183,9 +183,8 @@ NOTE: This part is under developement, one fixed finally
 
 class MultClassLogisticRegression:
     def __init__(self, X, y):
-        self.X, self.y  = universal_reshape(X, y)
-        self.is_OneHotEncode = is_OneHotEncode
-        self.y = OneHotEncode(self.y)
+        self.X_train, self.y_train  = universal_reshape(X, y)
+        self.y_train = OneHotEncode(self.y_train)
         
         self.W = np.random.randn(self.y_train.shape[1], self.X_train.shape[0])
         self.b = np.zeros(shape=(1,1))
@@ -228,7 +227,7 @@ class MultClassLogisticRegression:
         return 1/m * np.sum(prediction == ground_truth)
     
     def _compute_grads(self, A):
-        m = len(A_train)
+        m = len(A)
         delta = A - self.y_train 
 
         W_grad = np.dot(delta.T, self.X_train.T)
@@ -242,8 +241,32 @@ class MultClassLogisticRegression:
             loss = self.log_loss(A_train, self.y_train)
 
             W_grad, b_grad = self._compute_grads(A_train)
-            W -= learning_rate * W_grad 
-            b -= learning_rate * b_grad 
+            self.W -= learning_rate * W_grad 
+            self.b -= learning_rate * b_grad 
 
             if epoch % 50  == 0:
                 print(f"After epoch {epoch} loss: {loss} acc: {self.accuracy(A_train, self.y_train)}")
+
+
+
+if __name__ == '__main__':
+  import numpy as np
+  import pandas as pd
+  from sklearn.model_selection import train_test_split
+
+  data = pd.read_csv(r'/content/sample_data/mnist_train_small.csv')
+  features, labels = np.array(data.iloc[:,1:]), np.array(data.iloc[:, :1])
+  X_train, X_test, y_train, y_test = train_test_split(features, labels)
+  X_train = (X_train - np.mean(X_train)) / np.std(X_train)
+  X_test = (X_test - np.mean(X_test)) / np.std(X_test)
+  
+  regressor = MultClassLogisticRegression(X_train, y_train)
+  regressor.fit(epochs=50, learning_rate=0.03)
+
+  predictions = regressor.predict(X_test)
+  predictions = predictions.reshape(len(predictions), 1)
+
+  print(predictions.shape, y_test.shape)
+  print(regressor.accuracy(predictions, y_test))
+
+
