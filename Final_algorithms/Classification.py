@@ -175,69 +175,75 @@ class LogisticRegression:
 
 """
 
-NOTE: This part is under developement, as there is a problem, for which, my model
-      is unstable and cant handle very large inputs or learning rate, which is an 
-      obvious problem, so this part is under developemet and contains some bugs
-      once fixed, a final class called 'LogisticRegression' will be created as
-      more general in its nature
+NOTE: This part is under developement, one fixed finally 
+    a final class called 'LogisticRegression' will be created as
+    more general in its nature
 
 """
 
 class MultClassLogisticRegression:
     def __init__(self, X, y):
-        self.X, self.y = universal_reshape(X, y)
-        self.y = OneHotEncode(self.y).T
-        '''
-        Though in the final code, just check, whether it is
-        having One-Hot-Encoding or not
-        '''
-        self.W = np.random.randn(self.y.shape[0], self.X.shape[0])* np.sqrt(1. / self.X.shape[1])
-        self.b = np.zeros(shape=(1, self.X.shape[1]))
+        self.X, self.y  = universal_reshape(X, y)
+        self.is_OneHotEncode = is_OneHotEncode
+        self.y = OneHotEncode(self.y)
+        
+        self.W = np.random.randn(self.y_train.shape[1], self.X_train.shape[0])
+        self.b = np.zeros(shape=(1,1))
+
+    def _softmax(self, Z):
+        if Z.shape[0] < Z.shape[1]:
+            Z = Z.T 
+        
+        diff = np.max(Z, axis=1)
+        diff = diff.reshape(len(diff), 1)
+        exps = np.exp(Z-diff)
+        sums = np.sum(exps, axis=1, keepdims=True)
+        softmax = exps/sums
+        return softmax
     
     def _feed_forward(self):
-        Z = np.dot(self.W, self.X) + self.b
-        return Z
+        Z = np.dot(self.W, self.X_train) + self.b 
+        A = self._softmax(Z)
+        return (Z, A)
     
-    def _softmax(self, X):
-        if X.shape[0] < X.shape[1]:
-            X = X.T
-        X_exp = np.exp(X-X.max())
-        for i in range(0, X_exp.shape[0]-1):
-            X_exp[i:i+1] = X_exp[i:i+1]/X_exp[i:i+1].sum()
-        return X_exp.T
+    def predict(self, X):
+        X, _ = universal_reshape(X, X)
+
+        Z = np.dot(self.W, X) + self.b 
+        A = self._softmax(Z)
+        probabilities = np.argmax(A, axis=1)
+        return probabilities
     
-    def accuracy(self, predictions, ground_truth):
-        ground_truth = np.argmax(ground_truth, axis=0)
-        predictions = np.argmax(predictions, axis=0)
-        number_example = predictions.shape[0]
-        accuracy = (np.sum(np.round(predictions) == ground_truth)) / number_example
-        return accuracy
+    def log_loss(self, prediction, ground_truth):
+        m = len(prediction)
+        loss = -1/m * np.sum(ground_truth * np.log(prediction + 1e-8), keepdims=True)
+        return loss
     
-    def _categorical_cross_entropy(self, Y_pred):
-        m = Y_pred.shape[1]
-        return -1/m * np.sum(self.y * np.log(Y_pred))
+    def accuracy(self, prediction, ground_truth):
+        # make an another universal reshape fucntion for one hot encodes speacially
+
+        prediction = np.argmax(prediction, axis=1)
+        ground_truth = np.argmax(ground_truth, axis=1)
+        m = len(prediction)
+        return 1/m * np.sum(prediction == ground_truth)
     
-    def _compute_grads(self, Y_pred):
-        W_grad = np.dot((Y_pred - self.y), self.X.T)
-        b_grad = np.sum((Y_pred - self.y), axis=0, keepdims = True)
-        
+    def _compute_grads(self, A):
+        m = len(A_train)
+        delta = A - self.y_train 
+
+        W_grad = np.dot(delta.T, self.X_train.T)
+        b_grad = 1/m * np.sum(delta.T, keepdims=True)
+
         return (W_grad, b_grad)
     
-    def predict(self, X_test):
-        Z_test = np.dot(self.W, X_test) + self.b
-        Y_pred = self._softmax(Z_test)
-        return Y_pred
-    
-    def train(self, learning_rate=0.01, epochs=100):
-        for epoch in range(epochs):
-            Z_pred = self._feed_forward()
-            Y_pred = self._softmax(Z_pred)
-            cost = self._categorical_cross_entropy(Y_pred)
-            W_grad, b_grad = self._compute_grads(Y_pred)
+    def fit(self, epochs, learning_rate=0.001):
+        for epoch in range(1, epochs+1):
+            Z_train, A_train = self._feed_forward()
+            loss = self.log_loss(A_train, self.y_train)
 
-            self.W -= learning_rate * W_grad
-            self.b -= learning_rate * b_grad
+            W_grad, b_grad = self._compute_grads(A_train)
+            W -= learning_rate * W_grad 
+            b -= learning_rate * b_grad 
 
-            if epoch % 50 == 0:
-                print(f"After epoch {epoch} cost: {cost}, acc: {self.accuracy(Y_pred, self.y)}")
-
+            if epoch % 50  == 0:
+                print(f"After epoch {epoch} loss: {loss} acc: {self.accuracy(A_train, self.y_train)}")
