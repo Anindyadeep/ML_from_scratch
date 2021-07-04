@@ -17,8 +17,7 @@ Regression:
 ```
 Classification:
         1. K-Nearest Neighbors (KNN)
-        2. Binary Logistic Regression
-        3. Multi class Logistic Regression
+        2. Logistic Regression (can work for both binary and multi class)
 
         TODO:
         1. Support Vector Machines
