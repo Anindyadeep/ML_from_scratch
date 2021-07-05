@@ -15,6 +15,8 @@ Regression:
         TODO:
         1. Support Vector Machines (regression)
         2. Xg Boost (regression)
+        3. Decision Tree regression 
+        
         
 ```
 
