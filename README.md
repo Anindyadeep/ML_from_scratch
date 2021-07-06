@@ -12,6 +12,12 @@ Regression:
         6. Polynomial Ridge Regression
         7. K-Nearest Neighbors (KNN) [Regression]
         
+        TODO:
+        1. Support Vector Machines (regression)
+        2. Xg Boost (regression)
+        3. Decision Tree regression 
+        
+        
 ```
 
 ```
@@ -24,6 +30,8 @@ Classification:
         2. Naive Bayes
         3. Decison Trees
         4. Random Forests
+        5. Ada Boost
+        6. Xg boost
         
 ```
 
