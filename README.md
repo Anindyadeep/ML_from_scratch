@@ -24,14 +24,14 @@ Regression:
 Classification:
         1. K-Nearest Neighbors (KNN)
         2. Logistic Regression (can work for both binary and multi class)
+        3 Naive Bayes
 
         TODO:
         1. Support Vector Machines
-        2. Naive Bayes
-        3. Decison Trees
-        4. Random Forests
-        5. Ada Boost
-        6. Xg boost
+        2. Decison Trees
+        3. Random Forests
+        4. Ada Boost
+        5. Xg boost
         
 ```
 
