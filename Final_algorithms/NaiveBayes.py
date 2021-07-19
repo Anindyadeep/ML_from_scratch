@@ -1,6 +1,5 @@
 import math 
 import numpy as np 
-from ml_regression_utils import universal_reshape
 
 class GaussianNaiveBayes:
     def __init__(self, X, y):
